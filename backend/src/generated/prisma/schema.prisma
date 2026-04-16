@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//  USUÁRIOS
+
+model User {
+  id        String  @id
+  name      String?
+  email     String  @unique
+  password  String
+  avatarUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  pins      Pin[]
+  favorites Favorite[]
+  comments  Comment[]
+}
+
+//  PINS NO MAPA
+
+model Pin {
+  id String @id @default(uuid())
+
+  title       String
+  description String?
+
+  latitude  Float
+  longitude Float
+
+  imageUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //  Relacionamentos
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  comments  Comment[]
+  favorites Favorite[]
+}
+
+//  CATEGORIAS
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+
+  pins Pin[]
+}
+
+//  FAVORITOS
+
+model Favorite {
+  id String @id @default(uuid())
+
+  userId String
+  pinId  String
+
+  user User @relation(fields: [userId], references: [id])
+  pin  Pin  @relation(fields: [pinId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, pinId])
+}
+
+//  COMENTÁRIOS
+
+model Comment {
+  id String @id @default(uuid())
+
+  text String
+
+  createdAt DateTime @default(now())
+
+  userId String
+  pinId  String
+
+  user User @relation(fields: [userId], references: [id])
+  pin  Pin  @relation(fields: [pinId], references: [id])
+}
