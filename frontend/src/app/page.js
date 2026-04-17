@@ -1,15 +1,19 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-
 export default function Home() {
-  const router = useRouter();
-
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100 gap-4">
-      <Button onClick={() => router.push("/login")}>Login</Button>
-      <Button onClick={() => router.push("/registro")}>Registrar</Button>
+    <main className="flex min-h-screen items-center justify-center bg-[#3d6b3d]">
+      <div className="max-w-2xl text-center px-8">
+        <h1 className="text-5xl font-extrabold text-[#a8c5a0] mb-6">
+          Mapa Interativo
+        </h1>
+        <p className="text-lg text-[#a8c5a0] mb-4">
+          Explore locais de acidente no mapa.
+        </p>
+        <p className="text-md text-[#a8c5a0] opacity-75">
+          Faça login ou cadastre-se para começar a adicionar seus pins.
+        </p>
+      </div>
     </main>
   );
 }
