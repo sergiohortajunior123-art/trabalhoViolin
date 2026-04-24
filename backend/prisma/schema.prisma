@@ -1,53 +1,49 @@
+
 generator client {
   provider = "prisma-client-js"
-  output = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-
-//  USUÁRIOS
-
 model User {
-  id        String   @id 
+  id        String  @id
   name      String?
-  email     String   @unique
-  password  String
+  email     String  @unique
   avatarUrl String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relações
-  pins       Pin[]
-  favorites  Favorite[]
-  comments   Comment[]
+  pins          Pin[]
+  favorites     Favorite[]
+  comments      Comment[]
+  emailVerified Boolean    @default(false)
+  image         String?
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
 }
 
-
-//  PINS NO MAPA
-
-
 model Pin {
-  id          String   @id @default(uuid())
+  id String @id @default(uuid())
 
   title       String
   description String?
 
-  latitude    Float
-  longitude   Float
+  latitude  Float
+  longitude Float
 
-  imageUrl    String?
+  imageUrl String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  //  Relacionamentos
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userId String
-  user   User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id])
@@ -56,19 +52,12 @@ model Pin {
   favorites Favorite[]
 }
 
-
-//  CATEGORIAS
-
-
 model Category {
   id   String @id @default(uuid())
   name String @unique
 
   pins Pin[]
 }
-
-
-//  FAVORITOS
 
 model Favorite {
   id String @id @default(uuid())
@@ -84,9 +73,6 @@ model Favorite {
   @@unique([userId, pinId])
 }
 
-
-//  COMENTÁRIOS
-
 model Comment {
   id String @id @default(uuid())
 
@@ -99,4 +85,52 @@ model Comment {
 
   user User @relation(fields: [userId], references: [id])
   pin  Pin  @relation(fields: [pinId], references: [id])
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
