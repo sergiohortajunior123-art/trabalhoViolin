@@ -12,10 +12,6 @@ export default function TopbarMenu() {
     </Link>
     
     <nav className="flex flex-row items-center gap-7.5">
-        <div className="flex gap-6 text-sm text-[#a8c5a0]">
-            <Link href={"/novo-pin"}>Adicionar pin</Link>
-            <Link href={"/ver-mapa"}>Ver mapa</Link>
-        </div>
         <div className="flex gap-6">
             <Link href={"/login"}><Button variant="outline" className="text-[#a8c5a0] border-[#a8c5a0]">Login</Button></Link>
             <Link href={"/signup"}><Button className="text-white bg-[#1a2e1a] hover:bg-[#3d6b3d]">Cadastrar-se</Button></Link>

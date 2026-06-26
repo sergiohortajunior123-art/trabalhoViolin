@@ -1,91 +1,91 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
+import { Input } from "./ui/input";
+import { authClient } from "@/lib/auth-client";
 
-const BACKEND_URL = "http://localhost:3001"
+export default function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-export function LoginForm({
-  className,
-  ...props
-}) {
-  async function handleSubmit(event) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
+  const router = useRouter();
 
-    if (!email || !password) {
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError("Email ou senha inválidos.");
       return;
     }
 
-    await fetch(`${BACKEND_URL}/api/auth/signin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-      credentials: "include",
-    });
+    router.push("/dashboard");
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Logue em sua conta</CardTitle>
-          <CardDescription>
-            Insira seu email abaixo para acessar sua conta
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" name="email" type="email" placeholder="m@example.com" required />
-              </Field>
-              <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Senha</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
-                    Esqueceu sua senha?
-                  </a>
-                </div>
-                <Input id="password" name="password" type="password" required />
-              </Field>
-              <Field>
-                <Button type="submit">Login</Button>
-                <Button variant="outline" type="button">
-                  Login com Google
-                </Button>
-                <FieldDescription className="text-center">
-                  Não tem uma conta? <a href="#">Cadastre-se</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit}>
+        <FieldGroup>
+          <div className="flex flex-col items-center gap-2 text-center mb-10">
+            <h1 className="text-xl font-bold">Bem-vindo ao Mapa Interativo de Acidentes</h1>
+            <FieldDescription>
+              Não tem uma conta? <Link href="/signup">Cadastre-se</Link>
+            </FieldDescription>
+          </div>
+
+          {/* Mensagem de erro */}
+          {error && (
+            <p className="text-sm text-red-500 text-center mb-2">{error}</p>
+          )}
+
+          <Field>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <Input
+              id="email"
+              type="email"
+              placeholder="mary.doe@email.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Field>
+          <Field className="mb-8">
+            <FieldLabel htmlFor="password">Senha</FieldLabel>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Digite sua senha aqui"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Field>
+          <Field>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Entrando..." : "Login"}
+            </Button>
+          </Field>
+        </FieldGroup>
+      </form>
+      <FieldDescription className="px-6 text-center">
+        Ao clicar em continuar, você concorda com nossos{" "}
+        <a href="#">Termos de Serviços</a> e{" "}
+        <a href="#">Política de Privacidade</a>.
+      </FieldDescription>
     </div>
   );
 }

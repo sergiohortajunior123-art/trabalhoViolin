@@ -63,3 +63,14 @@ model Verification {
 
   @@map("verification")
 }
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  species   String
+  time      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}

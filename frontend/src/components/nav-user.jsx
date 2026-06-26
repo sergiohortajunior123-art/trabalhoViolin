@@ -1,8 +1,7 @@
-// src/components/nav-user.jsx
 "use client";
 
 import { ChevronsUpDown, LogOut } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,6 +18,23 @@ import {
 
 export function NavUser({ user }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+  async function handleLogout() {
+    try {
+      await fetch("http://localhost:3001/api/auth/sign-out", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -46,8 +62,8 @@ export function NavUser({ user }) {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuItem>
-              <LogOut />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50">
+              <LogOut className="mr-2 h-4 w-4" />
               Sair
             </DropdownMenuItem>
           </DropdownMenuContent>

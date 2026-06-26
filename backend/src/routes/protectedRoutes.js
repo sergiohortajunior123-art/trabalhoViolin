@@ -1,16 +1,15 @@
-import express from "express";
 import { auth } from "../lib/auth.js";
+import { fromNodeHeaders } from "better-auth/node";
 
-const router = express.Router();
+export async function authMiddleware(req, res, next) {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
 
-router.get(
-  "/protected",
-  auth.handler,
-  (req, res) => {
-    res.json({
-      message: "Rota protegida funcionando ",
-    });
+  if (!session) {
+    return res.status(401).json({ error: "Não autorizado." });
   }
-);
 
-export default router;
+  req.user = session.user;
+  next();
+}
